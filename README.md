@@ -4,6 +4,7 @@
 2. [Working with Ordered Inserts](#schema2)
 3. [Understanding the `writeConcern`](#schema3)
 4. [Atomicity](#schema4)
+5. [Importing Data](#schema5)
 
 
 <hr>
