@@ -3,6 +3,7 @@
 1. [Intro](#schema1)
 2. [Working with Ordered Inserts](#schema2)
 3. [Understanding the `writeConcern`](#schema3)
+4. [Atomicity](#schema4)
 
 
 <hr>
@@ -193,4 +194,126 @@ de escritura. Si la operación no se confirma dentro de este límite, se genera 
 
 **fsync:** Este parámetro, cuando se establece en true, asegura que los datos se han sincronizado en disco antes de que 
 se considere completa la operación de escritura. Este es un nivel más alto de garantía de durabilidad 
-que escribir en el diario. 
+que escribir en el diario.
+
+<hr>
+
+<a name="schema4"></a>
+
+## 4. Atomicity
+
+![img](./img/create4.png)
+
+En MongoDB, el término "atomicidad" se refiere a la propiedad de las operaciones que se ejecutan como una unidad 
+atómica e indivisible. En el contexto de bases de datos, una operación atómica es aquella que se ejecuta completamente 
+o no se ejecuta en absoluto, y no hay un estado intermedio visible para otros procesos.
+
+En MongoDB, las operaciones de escritura (por ejemplo, inserciones, actualizaciones y eliminaciones) en un solo 
+documento son atómicas por naturaleza. Esto significa que si ejecutas una operación de escritura en un solo documento, 
+la operación se realiza en su totalidad o no se realiza en absoluto. Otros procesos que acceden al mismo documento 
+no verán un estado intermedio durante la operación.
+
+Sin embargo, es importante tener en cuenta que la atomicidad no se extiende automáticamente a operaciones que 
+afectan a varios documentos o que involucran transacciones más complejas. MongoDB ofrece ciertas características 
+y operaciones que permiten trabajar con transacciones y garantizar niveles más altos de atomicidad:
+
+Operaciones Atómicas en un Solo Documento:
+
+insertOne: Inserta un solo documento atómicamente.
+updateOne y updateMany: Actualizan un solo documento o varios documentos atómicamente.
+deleteOne y deleteMany: Eliminan un solo documento o varios documentos atómicamente.
+Transacciones:
+
+MongoDB a partir de la versión 4.0 admite transacciones en clústeres de replicación.
+Puedes utilizar startSession, withTransaction, y las operaciones commitTransaction y abortTransaction para realizar 
+operaciones atómicas que involucren varios documentos en una transacción.
+Es importante entender y considerar las necesidades de atomicidad en el diseño de tu aplicación y elegir las 
+operaciones y características de MongoDB que mejor se adapten a esos requisitos. La atomicidad es un principio 
+fundamental en el diseño de bases de datos para garantizar la integridad y consistencia de los datos.
+
+
+<hr>
+
+<a name="schema5"></a>
+
+## 5. Importing Data
+
+`mongoimport` es una utilidad de línea de comandos proporcionada por MongoDB que te permite importar datos en una base 
+de datos MongoDB desde varios formatos de archivo. Puedes utilizar mongoimport para cargar datos en una colección 
+MongoDB desde archivos JSON, CSV, TSV (tab-separated values), o BSON.
+
+La sintaxis básica de mongoimport es la siguiente:
+
+```
+mongoimport --options <file>
+```
+
+Donde --options son las opciones que especifican cómo se deben importar los datos, y <file> es el archivo 
+que contiene los datos que deseas importar.
+
+Algunas opciones comunes de mongoimport incluyen:
+
+--host: Especifica el servidor de MongoDB al que te estás conectando.
+--db: Especifica la base de datos en la que deseas importar los datos.
+--collection: Especifica la colección en la que deseas importar los datos.
+--type: Especifica el tipo de archivo de entrada (por ejemplo, json, csv, tsv, bson).
+--file: Especifica el archivo que contiene los datos que deseas importar.
+--jsonArray: Si el archivo JSON es un arreglo JSON en lugar de un documento por línea.
+--headerline: Especifica que la primera línea del archivo CSV/TSV contiene nombres de campo.
+Aquí hay un ejemplo básico de uso de mongoimport:
+
+```
+mongoimport --host localhost --db miBaseDeDatos --collection miColeccion --type json --file datos.json
+```
+
+En este ejemplo, se importan datos desde un archivo JSON llamado datos.json en la colección 
+miColeccion de la base de datos miBaseDeDatos en el servidor local.
+
+Recuerda ajustar las opciones según tus necesidades específicas, y ten en cuenta que mongoimport es 
+útil para cargar datos iniciales en MongoDB o para importar datos de archivos externos en una base de datos existente.
+
+
+```
+mongoimport tv-shows.json -d movieData -c movies --jsonArray --drop
+2023-11-28T11:12:18.697+0100	connected to: mongodb://localhost/
+2023-11-28T11:12:18.698+0100	dropping: movieData.movies
+2023-11-28T11:12:18.795+0100	240 document(s) imported successfully. 0 document(s) failed to import.
+
+
+movieData> show collections
+movies
+movieData> db.movies.find()
+[
+  {
+    _id: ObjectId('6565bd02f59902f29c66619f'),
+    id: 1,
+    url: 'http://www.tvmaze.com/shows/1/under-the-dome',
+    name: 'Under the Dome',
+    type: 'Scripted',
+    language: 'English',
+    genres: [ 'Drama', 'Science-Fiction', 'Thriller' ],
+    status: 'Ended',
+    runtime: 60,
+    premiered: '2013-06-24',
+    officialSite: 'http://www.cbs.com/shows/under-the-dome/',
+    schedule: { time: '22:00', days: [ 'Thursday' ] },
+    rating: { average: 6.5 },
+    weight: 91,
+    network: {
+      id: 2,
+      name: 'CBS',
+      country: {
+        name: 'United States',
+        code: 'US',
+        timezone: 'America/New_York'
+      }
+
+```
+
+![img](./img/create5.png)
+
+
+
+
+
+
